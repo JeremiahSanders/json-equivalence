@@ -1,5 +1,5 @@
 [<AutoOpen>]
-module Jds.JsonEquivalence.Tests.TestData.ArrayCases
+module Jds.JsonEquivalence.Tests.Unit.TestData.ArrayCases
 
 let emptyArray = "[]"
 let numericArray = "[1,2,3]"

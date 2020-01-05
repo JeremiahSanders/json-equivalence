@@ -1,4 +1,4 @@
-module Jds.JsonEquivalence.Tests.TestData.BooleanCases
+module Jds.JsonEquivalence.Tests.Unit.TestData.BooleanCases
 
 let sourceJson = """{
   "active": true,

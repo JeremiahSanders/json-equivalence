@@ -1,4 +1,4 @@
-namespace Jds.JsonEquivalence.Tests
+namespace Jds.JsonEquivalence.Tests.Unit
 
 module JsonComparisonTests =
     open System

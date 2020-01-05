@@ -1,4 +1,4 @@
-namespace Jds.JsonEquivalence.Tests
+namespace Jds.JsonEquivalence.Tests.Unit
 
 open Jds.JsonEquivalence
 open Xunit
