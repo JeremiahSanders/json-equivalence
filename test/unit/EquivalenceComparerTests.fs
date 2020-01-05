@@ -7,7 +7,7 @@ module EquivalenceComparerTests =
     module AreEquivalent =
         [<Fact>]
         let ``Identifies equivalence``() =
-            let options = EquivalenceOptions(EquivalenceValueOptions(false))
+            let options = EquivalenceOptions(EquivalenceValueOptions(false), EquivalencePropertyOptions.Default)
             let actual =
                 EquivalenceComparer.AreEquivalent
                     (options, TestData.NestedObjectCases.sourceJson, TestData.NestedObjectCases.childPropertyReordered)

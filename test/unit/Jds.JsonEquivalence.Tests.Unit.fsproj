@@ -11,6 +11,7 @@
     <Compile Include="TestData\ArrayCases.fs" />
     <Compile Include="TestData\RootPropertyCases.fs" />
     <Compile Include="TestData\NestedObjectCases.fs" />
+    <Compile Include="TestData\IgnoredPropertyCases.fs" />
     <Compile Include="JsonComparisonTests.fs" />
     <Compile Include="EquivalenceComparerTests.fs" />
     <Compile Include="Program.fs" />
