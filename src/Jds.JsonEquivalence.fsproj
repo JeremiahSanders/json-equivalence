@@ -5,7 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Library.fs" />
+    <Compile Include="JsonComparison.fs" />
+    <Compile Include="EquivalenceComparer.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DotNetCliToolReference Include="dotnet-fantomas" Version="2.9.2" />
   </ItemGroup>
 
 </Project>

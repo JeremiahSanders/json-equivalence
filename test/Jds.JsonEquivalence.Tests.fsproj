@@ -8,7 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Tests.fs" />
+    <Compile Include="TestData\ArrayCases.fs" />
+    <Compile Include="TestData\BooleanCases.fs" />
+    <Compile Include="TestData\RootPropertyCases.fs" />
+    <Compile Include="TestData\NestedObjectCases.fs" />
+    <Compile Include="JsonComparisonTests.fs" />
+    <Compile Include="EquivalenceComparerTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
@@ -17,6 +22,14 @@
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
     <PackageReference Include="coverlet.collector" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DotNetCliToolReference Include="dotnet-fantomas" Version="2.9.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\Jds.JsonEquivalence.fsproj" />
   </ItemGroup>
 
 </Project>
