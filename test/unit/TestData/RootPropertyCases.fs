@@ -1,5 +1,5 @@
 [<AutoOpen>]
-module Jds.JsonEquivalence.Tests.TestData.RootPropertyCases
+module Jds.JsonEquivalence.Tests.Unit.TestData.RootPropertyCases
 
 let sourceJson = """{
   "name": "one",

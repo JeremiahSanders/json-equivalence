@@ -1,4 +1,4 @@
-module Jds.JsonEquivalence.Tests.TestData.NestedObjectCases
+module Jds.JsonEquivalence.Tests.Unit.TestData.NestedObjectCases
 
 let sourceJson = """{
     "meta": {
