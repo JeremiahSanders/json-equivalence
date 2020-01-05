@@ -2,6 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Title>JSON Equivalence</Title>
+    <Description>A simple library to support validating JSON object equivalence in tests.</Description>
+    <Copyright>Copyright 2020 Jeremiah Sanders</Copyright>
+    <PackageProjectUrl>https://github.com/JeremiahSanders/json-equivalence</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/JeremiahSanders/json-equivalence</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Authors>jds</Authors>
+    <PackageTags>json;unit test;tests;testing;equivalence</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
