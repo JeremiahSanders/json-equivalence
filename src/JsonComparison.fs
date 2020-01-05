@@ -5,13 +5,25 @@ open System.Collections.Generic
 open System.Collections.ObjectModel
 open System.Text.Json
 
+/// Options controlling the equivalence comparison of JSON values.
 type EquivalenceValueOptions(caseSensitive : bool) =
+
+    /// <summary>Are string values comparisons case sensitive.</summary>
+    /// <remarks>Does not affect property name casing.</remarks>
     member this.CaseSensitive = caseSensitive
+
     new() = EquivalenceValueOptions(true)
+
+    /// Value options with string value case sensitivity.
     static member Strict = EquivalenceValueOptions(true)
+
+    /// Value options with string value case insensitivity.
     static member CaseInsensitive = EquivalenceValueOptions(false)
+
+    /// <summary>Default value options. Equal to <see cref="EquivalenceValueOptions.Strict" />.</summary>
     static member Default = EquivalenceValueOptions.Strict
 
+/// Options controlling the equivalence comparison of JSON object properties.
 type EquivalencePropertyOptions(ignoredPropertyPaths : IEnumerable<string>) =
 
     member internal this.IgnoredPropertyPaths : string list =
@@ -23,20 +35,40 @@ type EquivalencePropertyOptions(ignoredPropertyPaths : IEnumerable<string>) =
             |> Seq.distinct
             |> Seq.toList
 
+    /// <summary>JSON object property paths to ignore.</summary>
+    /// <remarks>Property paths should following a pattern like: <c>propertyName.child[2].subProperty</c>.</remarks>
     member this.IgnoredPaths : IReadOnlyCollection<string> =
         List(this.IgnoredPropertyPaths)
         |> (fun ignoredPaths -> ReadOnlyCollection(ignoredPaths) :> IReadOnlyCollection<string>)
-    member this.IsPropertyPathIgnored path = this.IgnoredPropertyPaths |> List.contains path
-    static member ofIgnoredPaths ignoredPropertyPaths = EquivalencePropertyOptions ignoredPropertyPaths
-    static member Default = EquivalencePropertyOptions(Seq.empty)
 
+    /// Determines if a path is ignored.
+    member this.IsPropertyPathIgnored path = this.IgnoredPropertyPaths |> List.contains path
+
+    /// Creates a new <see cref="EquivalencePropertyOptions" /> from the provided ignored property paths.
+    static member ofIgnoredPaths ignoredPropertyPaths = EquivalencePropertyOptions ignoredPropertyPaths
+
+    /// Property options with no ignored property paths.
+    static member NoIgnoredPaths = EquivalencePropertyOptions(Seq.empty)
+
+    /// <summary>Default property options. Equal to <see cref="EquivalencePropertyOptions.NoIgnoredPaths" />.</summary>
+    static member Default = EquivalencePropertyOptions.NoIgnoredPaths
+
+/// Options controlling the equivalence comparison of JSON documents.
 type EquivalenceOptions(valueOptions, propertyOptions) =
     new(valueOptions) = EquivalenceOptions(valueOptions, EquivalencePropertyOptions.Default)
     new(propertyOptions) = EquivalenceOptions(EquivalenceValueOptions.Default, propertyOptions)
     new() = EquivalenceOptions(EquivalenceValueOptions.Default, EquivalencePropertyOptions.Default)
+
+    /// Value equivalence comparison options.
     member this.Values = valueOptions
+
+    /// Object property equivalence comparison options.
     member this.Properties = propertyOptions
+
+    /// <summary>Equivalence options using <see cref="EquivalenceValueOptions.Strict" /> and <see cref="EquivalencePropertyOptions.Default" />.</summary>
     static member Strict = EquivalenceOptions(EquivalenceValueOptions.Strict, EquivalencePropertyOptions.Default)
+
+    /// <summary>Equivalence options using <see cref="EquivalenceValueOptions.Default" /> and <see cref="EquivalencePropertyOptions.Default" />.</summary>
     static member Default = EquivalenceOptions(EquivalenceValueOptions.Default, EquivalencePropertyOptions.Default)
 
 module JsonComparison =
@@ -135,6 +167,7 @@ module JsonComparison =
         | :? JsonException as jsonException -> false
         | :? ArgumentException as argumentException -> false
 
+    /// Compares two JSON documents for equivalence.
     let compare (options : EquivalenceOptions) expected actual =
         [ equalityComparer
           (jsonComparer options) ]
