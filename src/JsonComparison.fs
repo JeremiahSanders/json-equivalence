@@ -20,7 +20,18 @@ module JsonComparison =
         |> (fun stringComparison -> expected.Equals(actual, stringComparison))
 
     let private areNumbersEquivalent (options : EquivalenceOptions) (expected : JsonElement) (actual : JsonElement) =
-        expected.GetDecimal() = actual.GetDecimal() || expected.GetInt64() = actual.GetInt64()
+        let areInt64Equivalent() =
+            try
+                expected.GetInt64() = actual.GetInt64()
+            with :? FormatException as formatException -> false
+
+        let areDecimalEquivalent() =
+            try
+                expected.GetDecimal() = actual.GetDecimal()
+            with :? FormatException as formatException -> false
+
+        areDecimalEquivalent() || areInt64Equivalent()
+
     let private areStringsEquivalent (options : EquivalenceOptions) (expected : JsonElement) (actual : JsonElement) =
         compareStrings options (expected.GetString()) (actual.GetString())
 

@@ -15,108 +15,6 @@ module JsonComparisonTests =
         |> List.map (fun value -> (value :> Object))
         |> List.toArray
 
-    module TestData =
-        let emptyJsonObject = "{}"
-        let sourceJson = """{
-    "export": false,
-    "meta": {
-      "owner": "test-user"
-    },
-    "name": "NameValue",
-    "nodes": [
-      {
-        "children": ["a",4,false],
-        "key": "key-name",
-        "meta": {
-          "owner": "root"
-        },
-        "value": 5
-      },
-      "string value",
-      42,
-      false,
-      null,
-      true
-    ],
-    "order": -1,
-    "visible": true
-}
-"""
-        let reorderedArray = """{
-    "export": false,
-    "meta": {
-      "owner": "test-user"
-    },
-    "name": "NameValue",
-    "nodes": [
-      {
-        "children": ["a",4,false],
-        "key": "key-name",
-        "meta": {
-          "owner": "root"
-        },
-        "value": 5
-      },
-      "string value",
-      42,
-      null,
-      false,
-      true
-    ],
-    "order": -1,
-    "visible": true
-}
-"""
-        let reorderedRootProperties = """{
-    "order": -1,
-    "meta": {
-      "owner": "test-user"
-    },
-    "name": "NameValue",
-    "export": false,
-    "nodes": [
-      {
-        "children": ["a",4,false],
-        "key": "key-name",
-        "meta": {
-          "owner": "root"
-        },
-        "value": 5
-      },
-      "string value",
-      42,
-      false,
-      null,
-      true
-    ],
-    "visible": true
-}
-"""
-        let missingRootProperty = """{
-    "meta": {
-      "owner": "test-user"
-    },
-    "name": "NameValue",
-    "nodes": [
-      {
-        "children": ["a",4,false],
-        "key": "key-name",
-        "meta": {
-          "owner": "root"
-        },
-        "value": 5
-      },
-      "string value",
-      42,
-      false,
-      null,
-      true
-    ],
-    "order": -1,
-    "visible": true
-}
-"""
-
     let strictEquivalence = EquivalenceOptions.Strict
     let caseInsensitive : EquivalenceOptions = EquivalenceOptions(EquivalenceValueOptions(false))
 
@@ -152,8 +50,16 @@ module JsonComparisonTests =
                  TestData.NestedObjectCases.deepStringPropertyDiffers; false |] ]
 
         static member SimpleTestCases : obj [] list =
-            [ [| "same string"; strictEquivalence; TestData.sourceJson; TestData.sourceJson; true |]
-              [| "source vs empty object"; strictEquivalence; TestData.sourceJson; TestData.emptyJsonObject; false |] ]
+            let emptyJsonMinified = "{}"
+            let emptyJsonVerbose = """{
+
+}
+"""
+            [ [| "same string"; strictEquivalence; emptyJsonMinified; emptyJsonMinified; true |]
+              [| "only whitespace difference"; strictEquivalence; emptyJsonMinified; emptyJsonVerbose; true |]
+
+              [| "source vs empty object"; strictEquivalence; TestData.RootPropertyCases.sourceJson; emptyJsonMinified;
+                 false |] ]
 
         static member RootPropertyTestCases : obj [] list =
             [ [| "reordered"; strictEquivalence; TestData.RootPropertyCases.sourceJson;
@@ -177,14 +83,11 @@ module JsonComparisonTests =
               [| "differing string casing - value.caseInsensitive"; caseInsensitive;
                  TestData.RootPropertyCases.sourceJson; TestData.RootPropertyCases.differingStringCasing; true |]
 
-              [| "booleans - inverted false"; strictEquivalence; TestData.BooleanCases.sourceJson;
-                 TestData.BooleanCases.falseIsTrue; false |]
+              [| "booleans - inverted false"; strictEquivalence; TestData.RootPropertyCases.sourceJson;
+                 TestData.RootPropertyCases.falseIsTrue; false |]
 
-              [| "booleans - inverted true"; strictEquivalence; TestData.BooleanCases.sourceJson;
-                 TestData.BooleanCases.trueIsFalse; false |]
-
-              [| "booleans - reordered"; strictEquivalence; TestData.BooleanCases.sourceJson;
-                 TestData.BooleanCases.reordered; true |]
+              [| "booleans - inverted true"; strictEquivalence; TestData.RootPropertyCases.sourceJson;
+                 TestData.RootPropertyCases.trueIsFalse; false |]
 
               [| "arrays - missing element"; strictEquivalence; TestData.RootPropertyCases.sourceJson;
                  TestData.RootPropertyCases.arrayMissingElement; false |]
@@ -196,7 +99,10 @@ module JsonComparisonTests =
                  TestData.RootPropertyCases.nullPopulated; false |]
 
               [| "value replaced with null"; strictEquivalence; TestData.RootPropertyCases.nullPopulated;
-                 TestData.RootPropertyCases.sourceJson; false |] ]
+                 TestData.RootPropertyCases.sourceJson; false |]
+
+              [| "decimal value trimmed"; strictEquivalence; TestData.RootPropertyCases.sourceJson;
+                 TestData.RootPropertyCases.decimalValueTrimmed; false |] ]
 
         [<Theory>]
         [<MemberData("ArrayTestCases")>]
