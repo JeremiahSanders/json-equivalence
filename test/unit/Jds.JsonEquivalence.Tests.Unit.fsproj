@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <Compile Include="TestData\ArrayCases.fs" />
-    <Compile Include="TestData\BooleanCases.fs" />
     <Compile Include="TestData\RootPropertyCases.fs" />
     <Compile Include="TestData\NestedObjectCases.fs" />
     <Compile Include="JsonComparisonTests.fs" />
