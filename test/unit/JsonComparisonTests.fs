@@ -2,11 +2,9 @@ namespace Jds.JsonEquivalence.Tests.Unit
 
 module JsonComparisonTests =
     open System
-    open System.Collections.Generic
     open Xunit
     open Xunit.Abstractions
     open Jds.JsonEquivalence
-    open Jds.JsonEquivalence.JsonComparison
 
     let toObjectArraySingleton value : Object array = value :> Object |> Array.singleton
 
@@ -16,9 +14,30 @@ module JsonComparisonTests =
         |> List.toArray
 
     let strictEquivalence = EquivalenceOptions.Strict
-    let caseInsensitive : EquivalenceOptions = EquivalenceOptions(EquivalenceValueOptions(false))
+    let caseInsensitive : EquivalenceOptions =
+        EquivalenceOptions(EquivalenceValueOptions(false), EquivalencePropertyOptions.Default)
+    let strictIgnoreId =
+        EquivalenceOptions(EquivalenceValueOptions.Strict, EquivalencePropertyOptions.ofIgnoredPaths ([ "id" ]))
+    let caseInsensitiveIgnoreId : EquivalenceOptions =
+        EquivalenceOptions(EquivalenceValueOptions(false), EquivalencePropertyOptions.ofIgnoredPaths ([ "id" ]))
+    let strictIgnoreOwnerName =
+        EquivalenceOptions(EquivalenceValueOptions.Strict, EquivalencePropertyOptions.ofIgnoredPaths ([ "owner.name" ]))
+    let caseInsensitiveOwnerName : EquivalenceOptions =
+        EquivalenceOptions(EquivalenceValueOptions(false), EquivalencePropertyOptions.ofIgnoredPaths ([ "owner.name" ]))
+    let strictIgnoreTiming =
+        EquivalenceOptions(EquivalenceValueOptions.Strict, EquivalencePropertyOptions.ofIgnoredPaths ([ "timing" ]))
+    let strictIgnoreTiming0 =
+        EquivalenceOptions(EquivalenceValueOptions.Strict, EquivalencePropertyOptions.ofIgnoredPaths ([ "timing[0]" ]))
+    let strictIgnoreTiming1 =
+        EquivalenceOptions(EquivalenceValueOptions.Strict, EquivalencePropertyOptions.ofIgnoredPaths ([ "timing[1]" ]))
+    let strictIgnoreTiming1Key =
+        EquivalenceOptions
+            (EquivalenceValueOptions.Strict, EquivalencePropertyOptions.ofIgnoredPaths ([ "timing[1].key" ]))
+    let strictIgnoreTiming1Value =
+        EquivalenceOptions
+            (EquivalenceValueOptions.Strict, EquivalencePropertyOptions.ofIgnoredPaths ([ "timing[1].value" ]))
 
-    type SerializableRecordFromGameMessage(output : ITestOutputHelper) =
+    type CompareTests(output : ITestOutputHelper) =
 
         static member ArrayTestCases : obj [] list =
             [ [| "reordered array"; strictEquivalence; TestData.ArrayCases.numericArray;
@@ -41,6 +60,101 @@ module JsonComparisonTests =
 
               [| "extra element"; strictEquivalence; TestData.ArrayCases.numericArrayMissingElement;
                  TestData.ArrayCases.numericArray; false |] ]
+
+        static member IgnoredPropertyTestCases : obj [] list =
+            [ [| "different id - strict"; strictEquivalence; TestData.IgnoredPropertyCases.sourceJson;
+                 TestData.IgnoredPropertyCases.differentId; false |]
+
+              [| "different id - strictIgnoreId"; strictIgnoreId; TestData.IgnoredPropertyCases.sourceJson;
+                 TestData.IgnoredPropertyCases.differentId; true |]
+
+              [| "different owner name - strict"; strictEquivalence; TestData.IgnoredPropertyCases.sourceJson;
+                 TestData.IgnoredPropertyCases.differentOwnerName; false |]
+
+              [| "different owner name - caseInsensitive"; caseInsensitive; TestData.IgnoredPropertyCases.sourceJson;
+                 TestData.IgnoredPropertyCases.differentOwnerName; false |]
+
+              [| "different owner name - caseInsensitiveOwnerName"; caseInsensitiveOwnerName;
+                 TestData.IgnoredPropertyCases.sourceJson; TestData.IgnoredPropertyCases.differentOwnerName; true |]
+
+              [| "different owner name - strictIgnoreOwnerName"; strictIgnoreOwnerName;
+                 TestData.IgnoredPropertyCases.sourceJson; TestData.IgnoredPropertyCases.differentOwnerName; true |]
+
+              [| "different owner name casing - strict"; strictEquivalence; TestData.IgnoredPropertyCases.sourceJson;
+                 TestData.IgnoredPropertyCases.differentOwnerNameCasing; false |]
+
+              [| "different owner name casing - caseInsensitive"; caseInsensitive;
+                 TestData.IgnoredPropertyCases.sourceJson; TestData.IgnoredPropertyCases.differentOwnerNameCasing; true |]
+
+              [| "different owner name casing - caseInsensitiveOwnerName"; caseInsensitiveOwnerName;
+                 TestData.IgnoredPropertyCases.sourceJson; TestData.IgnoredPropertyCases.differentOwnerNameCasing; true |]
+
+              [| "different owner name casing - strictIgnoreOwnerName"; strictIgnoreOwnerName;
+                 TestData.IgnoredPropertyCases.sourceJson; TestData.IgnoredPropertyCases.differentOwnerNameCasing; true |]
+
+              [| "different array element string casing - strict"; strictEquivalence;
+                 TestData.IgnoredPropertyCases.sourceJson; TestData.IgnoredPropertyCases.differentArrayStringCasing;
+                 false |]
+
+              [| "different array element string casing - caseInsensitive"; caseInsensitive;
+                 TestData.IgnoredPropertyCases.sourceJson; TestData.IgnoredPropertyCases.differentArrayStringCasing;
+                 true |]
+
+              [| "different array element string casing - strictIgnoreTiming"; strictIgnoreTiming;
+                 TestData.IgnoredPropertyCases.sourceJson; TestData.IgnoredPropertyCases.differentArrayStringCasing;
+                 true |]
+
+              [| "different array element string casing - strictIgnoreTiming0"; strictIgnoreTiming0;
+                 TestData.IgnoredPropertyCases.sourceJson; TestData.IgnoredPropertyCases.differentArrayStringCasing;
+                 true |]
+
+              [| "different array element nested property value - strict"; strictEquivalence;
+                 TestData.IgnoredPropertyCases.sourceJson;
+                 TestData.IgnoredPropertyCases.differentArrayElementNestedPropertyValue; false |]
+
+              [| "different array element nested property value - caseInsensitive"; caseInsensitive;
+                 TestData.IgnoredPropertyCases.sourceJson;
+                 TestData.IgnoredPropertyCases.differentArrayElementNestedPropertyValue; false |]
+
+              [| "different array element nested property value - strictIgnoreTiming"; strictIgnoreTiming;
+                 TestData.IgnoredPropertyCases.sourceJson;
+                 TestData.IgnoredPropertyCases.differentArrayElementNestedPropertyValue; true |]
+
+              [| "different array element nested property value - strictIgnoreTiming1"; strictIgnoreTiming1;
+                 TestData.IgnoredPropertyCases.sourceJson;
+                 TestData.IgnoredPropertyCases.differentArrayElementNestedPropertyValue; true |]
+
+              [| "different array element nested property value - strictIgnoreTiming1Key"; strictIgnoreTiming1Key;
+                 TestData.IgnoredPropertyCases.sourceJson;
+                 TestData.IgnoredPropertyCases.differentArrayElementNestedPropertyValue; true |]
+
+              [| "different array element nested property value - strictIgnoreTiming1Value"; strictIgnoreTiming1Value;
+                 TestData.IgnoredPropertyCases.sourceJson;
+                 TestData.IgnoredPropertyCases.differentArrayElementNestedPropertyValue; false |]
+
+              [| "array element nested property missing - strict"; strictEquivalence;
+                 TestData.IgnoredPropertyCases.sourceJson;
+                 TestData.IgnoredPropertyCases.arrayElementNestedPropertyMissing; false |]
+
+              [| "array element nested property missing - caseInsensitive"; caseInsensitive;
+                 TestData.IgnoredPropertyCases.sourceJson;
+                 TestData.IgnoredPropertyCases.arrayElementNestedPropertyMissing; false |]
+
+              [| "array element nested property missing - strictIgnoreTiming"; strictIgnoreTiming;
+                 TestData.IgnoredPropertyCases.sourceJson;
+                 TestData.IgnoredPropertyCases.arrayElementNestedPropertyMissing; true |]
+
+              [| "array element nested property missing - strictIgnoreTiming1"; strictIgnoreTiming1;
+                 TestData.IgnoredPropertyCases.sourceJson;
+                 TestData.IgnoredPropertyCases.arrayElementNestedPropertyMissing; true |]
+
+              [| "array element nested property missing - strictIgnoreTiming1Key"; strictIgnoreTiming1Key;
+                 TestData.IgnoredPropertyCases.sourceJson;
+                 TestData.IgnoredPropertyCases.arrayElementNestedPropertyMissing; false |]
+
+              [| "array element nested property missing - strictIgnoreTiming1Value"; strictIgnoreTiming1Value;
+                 TestData.IgnoredPropertyCases.sourceJson;
+                 TestData.IgnoredPropertyCases.arrayElementNestedPropertyMissing; true |] ]
 
         static member NestedObjectTestCases : obj [] list =
             [ [| "child property reordered"; strictEquivalence; TestData.NestedObjectCases.sourceJson;
@@ -108,6 +222,14 @@ module JsonComparisonTests =
         [<MemberData("ArrayTestCases")>]
         member this.``Correctly identifies array equivalence`` (testCaseTitle : string) (options : EquivalenceOptions)
                (jsonLeft : string) (jsonRight : string) (shouldMatch : bool) =
+            let actual = JsonComparison.compare options jsonLeft jsonRight
+            output.WriteLine(sprintf "%s: %b %b" testCaseTitle shouldMatch actual)
+            Assert.Equal(shouldMatch, actual)
+
+        [<Theory>]
+        [<MemberData("IgnoredPropertyTestCases")>]
+        member this.``Correctly identifies ignored property object equivalence`` (testCaseTitle : string)
+               (options : EquivalenceOptions) (jsonLeft : string) (jsonRight : string) (shouldMatch : bool) =
             let actual = JsonComparison.compare options jsonLeft jsonRight
             output.WriteLine(sprintf "%s: %b %b" testCaseTitle shouldMatch actual)
             Assert.Equal(shouldMatch, actual)

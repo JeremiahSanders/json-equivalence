@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 
 namespace Jds.JsonEquivalence.Tests.CSharp
@@ -22,18 +23,43 @@ namespace Jds.JsonEquivalence.Tests.CSharp
     /// </summary>
     public class AreEquivalent
     {
-      private static bool Act(string expected, string actual)
+      private static EquivalenceOptions StrictEquivalence { get; } = EquivalenceOptions.Strict;
+
+      private static EquivalenceOptions CaseInsensitive { get; } =
+        new EquivalenceOptions(EquivalenceValueOptions.CaseInsensitive,
+          EquivalencePropertyOptions.ofIgnoredPaths(Array.Empty<string>()));
+
+      private static EquivalenceOptions PropertyIgnored { get; } = new EquivalenceOptions(
+        EquivalenceValueOptions.Strict,
+        EquivalencePropertyOptions.ofIgnoredPaths(
+          new[]
+          {
+            "name"
+          })
+      );
+
+      [Theory]
+      [InlineData(MinifiedExample, PrettyPrintedExample, true)]
+      [InlineData(MinifiedExample, PrettyPrintedDifferingCasingExample, false)]
+      public void GivenStrictEquivalenceIdentifiesEquivalence(string expected, string actual, bool shouldMatch)
       {
-        var options = new EquivalenceOptions(new EquivalenceValueOptions(false));
-        return EquivalenceComparer.AreEquivalent(options, expected, actual);
+        Assert.Equal(shouldMatch, EquivalenceComparer.AreEquivalent(StrictEquivalence, expected, actual));
       }
 
       [Theory]
       [InlineData(MinifiedExample, PrettyPrintedExample, true)]
       [InlineData(MinifiedExample, PrettyPrintedDifferingCasingExample, true)]
-      public void IdentifiesEquivalence(string expected, string actual, bool shouldMatch)
+      public void GivenPropertyIgnoredEquivalenceIdentifiesEquivalence(string expected, string actual, bool shouldMatch)
       {
-        Assert.Equal(shouldMatch, Act(expected, actual));
+        Assert.Equal(shouldMatch, EquivalenceComparer.AreEquivalent(PropertyIgnored, expected, actual));
+      }
+
+      [Theory]
+      [InlineData(MinifiedExample, PrettyPrintedExample, true)]
+      [InlineData(MinifiedExample, PrettyPrintedDifferingCasingExample, true)]
+      public void GivenCaseInsensitiveEquivalenceIdentifiesEquivalence(string expected, string actual, bool shouldMatch)
+      {
+        Assert.Equal(shouldMatch, EquivalenceComparer.AreEquivalent(CaseInsensitive, expected, actual));
       }
     }
 
